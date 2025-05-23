@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "name_for_model": "growth_copilot",
+  "name_for_human": "Growth Copilot",
+  "description_for_model": "E-ticaret performans analizi, veri arama ve strateji önerileri sunan GPT Plugin.",
+  "description_for_human": "E-ticaret verilerinizi analiz edin, trendleri ve stratejileri keşfedin.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://your-domain.com/.well-known/openapi.json"
+  },
+  "logo_url": "https://your-domain.com/logo.png",
+  "contact_email": "info@your-domain.com",
+  "legal_info_url": "https://your-domain.com/legal"
+} 

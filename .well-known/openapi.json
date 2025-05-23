@@ -1,0 +1,107 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Growth Copilot API",
+    "version": "1.0.0",
+    "description": "E-ticaret performans analizi ve strateji önerileri sunan API."
+  },
+  "paths": {
+    "/data/{filename}": {
+      "get": {
+        "summary": "JSON veri dosyasını döner.",
+        "parameters": [
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Veri dosyasının adı (ör: Shopify_Data veya Shopify_Data.json)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "JSON veri içeriği",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "type": "object" } }
+              }
+            }
+          },
+          "404": { "description": "Data file not found" }
+        }
+      }
+    },
+    "/export-excel/{filename}": {
+      "get": {
+        "summary": "JSON verisini Excel olarak indirir.",
+        "parameters": [
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Veri dosyasının adı (ör: Shopify_Data veya Shopify_Data.json)"
+          },
+          {
+            "name": "filename",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" },
+            "description": "İndirilecek Excel dosyasının adı (ör: Rapor_2024.xlsx)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Excel dosyası",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "404": { "description": "Data file not found" }
+        }
+      }
+    },
+    "/search-vector": {
+      "post": {
+        "summary": "FAISS index ile semantik arama yapar.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": { "type": "string", "description": "Aranacak metin" },
+                  "top_k": { "type": "integer", "description": "Dönen sonuç sayısı", "default": 3 }
+                },
+                "required": ["query"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "En yakın semantik sonuçlar",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Eksik parametre" },
+          "500": { "description": "FAISS index bulunamadı" }
+        }
+      }
+    }
+  }
+} 

@@ -1,0 +1,24 @@
+name: Fetch Data
+
+on:
+  schedule:
+    - cron: '0 5 * * *' # Her sabah 08:00 Türkiye saati (UTC+3)
+  workflow_dispatch:
+
+jobs:
+  fetch-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+      - name: Run fetch scripts
+        run: |
+          python Meta_Marketing_API/fetch_data.py
+          python Meta_Insights_API/fetch_data.py
+          python Shopify_Admin_API/fetch_data.py 

@@ -1,0 +1,12 @@
+# Environment ve secrets dosyaları
+.env
+*.env
+config.pyc
+__pycache__/
+Vectors/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+.DS_Store 

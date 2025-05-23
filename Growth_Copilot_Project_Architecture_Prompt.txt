@@ -1,0 +1,93 @@
+📁 Growth_Copilot Proje Klasör Yapısı
+
+```bash
+Growth_Copilot/
+│
+├── config.py
+│   # API token'larını os.getenv ile çeken yapı
+│   # GitHub Secrets üzerinden environment variable olarak alınır
+│   # Shopify için birden fazla ad account tanımlanabilir
+│   # İkinci hesabın token'ları yorum satırı olarak şablon halinde tutulabilir
+│
+├── app.py
+│   # Flask uygulaması
+│   # JSON endpoint'leri (GPT'ye veri sunar)
+│   # /data/... → JSON verisi döner
+│   # /export-excel/... → Excel dosyası döner (RAM uzerinde oluşur, diske yazılmaz)
+│   # /search-vector → FAISS + Embedding arama endpoint'i (RAG)
+│   # /search-vector, Vectors/faiss_index.bin dosyasını kullanarak semantik arama yapar
+│   # Örnek: /export-excel/meta-marketing?min_spend=1000
+│
+├── .well-known/
+│   # GPT Plugin tarafından tanınan metadata ve OpenAPI tanımları
+│   ├── ai-plugin.json
+│   │   # GPT Plugin manifest dosyası (name_for_model, description_for_model, auth, logo_url, contact_email)
+│   └── openapi.json
+│       # Tüm endpoint'leri tanımlayan OpenAPI 3.1 schema (data, excel, vector search)
+│
+├── .github/
+│   └── workflows/
+│       └── fetch_data.yml
+│           # GitHub Actions cronjob yapılandırması
+│           # Her sabah Türkiye saatine göre 08:00'de ilgili API'lere istek atar
+│           # Gelen veriyi Data/ klasörünü JSON olarak kaydeder
+│           # ✔ API'lerden sadece bir ÖNCEKİ günün verileri çekilir
+│           # ✔ Daha önceki verilerin üzerine eklenir, tekrar veri çekilmez
+│           # ✔ İlk veri çekiminde, sistem 2025-01-01 tarihinden başlayarak bugünden bir önceki güne kadar olan verileri toplu olarak çeker
+│           # ✔ Her bir veri kaydının içinde "veri tarihi" mutlaka yer alır (trend analizleri için zorunludur)
+│           # ✨ KPI ve parametre yapısı ilk aşamada kod üretici ajan tarafından önerildiği gibi uygulanacaktır. Daha sonra değiştirilebilir.
+│           # ✨ Shopify verileri e-ticaret işimin merkezinde olduğu için, GPT'nin strateji üretebilmesi adına doğru KPI'lara odaklanılması sağlanacaktır. E-ticaret için endüstri standartı KPI'lar kullanılmalıdır.
+│           # ✨ fetch_data.py dosyalarında oluşturulacak tüm veri satırlarında "veri tarihi" mutlaka bulunmalıdır. GPT'nin zamana dayalı analiz üretebilmesi için bu zorunludur.
+│
+├── Data/
+│   # Statik JSON veri klasörü (GPT bu dosyaları okur)
+│   # Her API modülü kendi verisini buraya kaydeder
+│   ├── Meta_Marketing_Data.json
+│   ├── Meta_Insights_Data.json
+│   └── Shopify_Data.json
+│
+├── Vectors/
+│   # OpenAI Embedding + FAISS tabanlı vektörel arama yapısı
+│   # Verilerden anlamlı cümle blokları çıkarılır, OpenAI Embedding ile vektöre çevrilir
+│   # FAISS index'e yazılır ve search-vector endpoint'inde kullanılır
+│   # FAISS index güncelleme işlemi haftada bir Pazartesi sabahı 08:00'de çalıştırılmalıdır
+│   # ✔ Haftada sadece 5-10 yeni kampanya varsa, bu periyot yeterlidir. Günlük yenilemeye gerek yoktur.
+│   ├── faiss_index.bin
+│   └── generate_faiss_index.py
+│       # Data/ klasöründeki JSON'ları doğrusal cümle bloklarına çevirir
+│       # Embedding API ile vektörleştirir, faiss_index.bin olarak kaydeder
+│
+├── Meta_Marketing_API/
+│   └── fetch_data.py
+│       # Meta Marketing API'ye istek atar
+│       # Gelen cevabı Data/Meta_Marketing_Data.json olarak kaydeder
+│
+├── Meta_Insights_API/
+│   └── fetch_data.py
+│       # Meta Insights API veri çekme scripti
+│
+├── Shopify_Admin_API/
+│   └── fetch_data.py
+│       # Shopify Admin API veri çekme scripti
+│       # ✔ Birden fazla Shopify hesabından veri çekmeye uygun yapıdadır
+│       # ✔ İkinci veya yeni account token'ları config.py'de yorum satırı ile eklenebilir
+│       # ✔ fetch_data.py içinde birden fazla token için istek döngüsü desteklenir, ama varsayılan tek hesap çekilir
+│
+├── README.md
+│   # Proje açıklamaları ve kullanım kılavuzu
+│
+└── .gitignore
+    # .env gibi hassas dosyaların git'e eklenmesini engeller
+```
+
+> 📌 Bu yapı sayesinde:
+> - Tek repo, tek config, tek secrets sistemiyle güvenli mimari sağlanır
+> - Tüm JSON veriler GPT için erişilebilir durumdadır
+> - İstenirse Excel olarak da indirilebilir, filtre uygulanabilir
+> - Her API kendi fetch scriptine sahiptir ve Data/ içine yazar
+> - GPT Plugin için gerekli endpoint’ler /data/..., /export-excel/... ve /search-vector altında sunulur
+> - Excel dosyası RAM üzerinde oluşturulur, diske yazılmaz
+> - Vektörel arama ve semantik analiz için FAISS + Embedding tabanlı RAG sistemi entegredir
+> - generate_faiss_index.py dosyası FAISS index oluşturur, app.py bu index ile semantik arama yapar
+> - .well-known/ klasörü GPT Plugin entegrasyonu için gerekli olan ai-plugin.json ve openapi.json dosyalarını içerir
+> - ✨ Data/ klasörü her sabah Türkiye saatine göre 08:00'de otomatik güncellenir; FAISS index ise sadece haftada 1 (Pazartesi 08:00) güncellenir. Bu durum, haftada 5-10 kampanya verisi değişimi olan yapılar için yeterlidir.
