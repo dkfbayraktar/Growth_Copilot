@@ -1,0 +1,56 @@
+name: Run Meta Normalized Daily to Hyper Script
+
+on:
+  schedule:
+    - cron: '30 3 * * *' # Her sabah 06:30 Türkiye saati (UTC+3)
+  workflow_dispatch:
+
+jobs:
+  convert-to-hyper:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # Meta hesap bilgilerini environment değişkeni olarak ekliyoruz
+      - name: Set environment variables
+        run: echo "Meta Environment variables are set"
+        env:
+          # Dencom LLC hesabı için
+          META_ACCOUNT_ID: ${{ secrets.META_ACCOUNT_ID }}
+          META_MARKETING_TOKEN: ${{ secrets.META_MARKETING_TOKEN }}
+          META_APP_ID: ${{ secrets.META_APP_ID }}
+          META_APP_SECRET: ${{ secrets.META_APP_SECRET }}
+          # Yeni hesaplar gerekiyorsa, config_meta.py ve .env dosyalarındaki yapıya uygun olarak buraya eklenmeli
+          # Örneğin:
+          # META_ACCOUNT_ID_2: ${{ secrets.META_ACCOUNT_ID_2 }}
+          # META_MARKETING_TOKEN_2: ${{ secrets.META_MARKETING_TOKEN_2 }}
+          # META_APP_ID_2: ${{ secrets.META_APP_ID_2 }}
+          # META_APP_SECRET_2: ${{ secrets.META_APP_SECRET_2 }}
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Hyper conversion script
+        run: |
+          python Meta_Marketing_API/fetch_meta_normalized_daily_to_hyper.py
+
+      - name: Commit and push hyper file
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -f Data/API_Data/Meta/meta_normalized_daily.hyper ]; then
+            git add Data/API_Data/Meta/meta_normalized_daily.hyper
+            git diff --quiet && git diff --staged --quiet || git commit -m "Update Meta normalized daily HYPER file"
+            git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:main
+          else
+            echo "Uyarı: meta_normalized_daily.hyper bulunamadı, push işlemi atlandı."
+          fi
+          

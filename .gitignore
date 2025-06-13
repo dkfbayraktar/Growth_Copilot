@@ -1,0 +1,30 @@
+# Environment ve secrets dosyaları
+.env
+.envs/
+*.env
+config.pyc
+
+# Python cache klasörleri
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Uygulama özel klasörleri
+Vectors/
+
+# SQLite ve diğer veritabanı dosyaları
+*.sqlite3
+*.db
+
+# MacOS sistem dosyası
+.DS_Store
+
+# Veri dosyaları (hepsi ignore edilir)
+*.parquet
+*.hyper
+*.json
+
+# Ancak plugin metadata JSON dosyaları hariç tutulur
+!docs/.well-known/ai-plugin.json
+!docs/.well-known/openapi.json
