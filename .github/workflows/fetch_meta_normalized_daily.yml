@@ -2,12 +2,13 @@ name: Run Meta Normalized Daily Script
 
 on:
   schedule:
-    - cron: '10 3 * * *' # Her sabah 06:10 Türkiye saati (UTC+3)
+    - cron: '10 3 * * *' # Her sabah 06:10 TR saati (UTC+3)
   workflow_dispatch:
 
 jobs:
   normalize-data:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
@@ -22,4 +23,18 @@ jobs:
 
       - name: Run normalization script
         run: |
-          python Meta_Marketing_API/fetch_meta_normalized_daily.py # Parquet dosyalarını normalize eden script
+          python Meta_Marketing_API/fetch_meta_normalized_daily.py
+
+      - name: Commit and push normalized data
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -f Data/API_Data/Meta/meta_normalized_daily.parquet ]; then
+            git add Data/API_Data/Meta/meta_normalized_daily.parquet
+            git diff --quiet && git diff --staged --quiet || git commit -m "Update Meta normalized daily data"
+            git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:main
+          else
+            echo "Uyarı: meta_normalized_daily.parquet bulunamadı, push işlemi atlandı."
+          fi
