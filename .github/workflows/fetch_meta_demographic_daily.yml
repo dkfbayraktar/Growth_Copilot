@@ -56,3 +56,5 @@ jobs:
             git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:main
           else
             echo "Uyarı: meta_demographic_daily.parquet bulunamadı, push işlemi atlandı."
+          fi
+          
