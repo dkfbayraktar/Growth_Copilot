@@ -1,4 +1,4 @@
-name: Run Meta JSON Daily Export Script
+name: Run Meta Normalized Daily to json Script
 
 on:
   schedule:
