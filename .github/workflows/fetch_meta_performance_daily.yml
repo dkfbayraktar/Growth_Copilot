@@ -18,7 +18,11 @@ jobs:
 
       # Meta hesap bilgilerini environment değişkeni olarak ekliyoruz
       - name: Set environment variables
-        run: echo "Meta Environment variables are set"
+        run: |
+          echo "META_ACCOUNT_ID=${{ secrets.META_ACCOUNT_ID }}" >> $GITHUB_ENV
+          echo "META_MARKETING_TOKEN=${{ secrets.META_MARKETING_TOKEN }}" >> $GITHUB_ENV
+          echo "META_APP_ID=${{ secrets.META_APP_ID }}" >> $GITHUB_ENV
+          echo "META_APP_SECRET=${{ secrets.META_APP_SECRET }}" >> $GITHUB_ENV
         env:
           # Dencom LLC hesabı için
           META_ACCOUNT_ID: ${{ secrets.META_ACCOUNT_ID }}
@@ -52,4 +56,3 @@ jobs:
             git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:main
           else
             echo "Uyarı: meta_performance_daily.parquet bulunamadı, push işlemi atlandı."
-          fi
