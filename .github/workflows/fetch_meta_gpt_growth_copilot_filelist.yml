@@ -32,6 +32,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           if [ -f Data/GPT_Friendly/Meta_Manifest/gpt_growth_copilot_meta_filelist.json ]; then
             git add Data/GPT_Friendly/Meta_Manifest/gpt_growth_copilot_meta_filelist.json
+            git add Data/GPT_Friendly/Meta_Manifest/Archive/*.json  # ✅ Archive klasöründeki versiyonlu dosyalar da ekleniyor
             git diff --quiet && git diff --staged --quiet || git commit -m "Update manifest file for Meta GPT"
             git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:main
           else
