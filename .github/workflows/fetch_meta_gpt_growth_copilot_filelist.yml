@@ -22,6 +22,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Manifest dosyasını oluştur
+        working-directory: Meta_Marketing_API
         run: python fetch_meta_gpt_growth_copilot_filelist.py
 
       - name: Değişiklikleri commit et ve pushla
@@ -32,8 +33,8 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           if [ -f Data/GPT_Friendly/Meta_Manifest/gpt_growth_copilot_meta_filelist.json ]; then
             git add Data/GPT_Friendly/Meta_Manifest/gpt_growth_copilot_meta_filelist.json
-            git add Data/GPT_Friendly/Meta_Manifest/Archive/*.json  # ✅ Archive klasöründeki versiyonlu dosyalar da ekleniyor
+            git add Data/GPT_Friendly/Meta_Manifest/Archive/*.json
             git diff --quiet && git diff --staged --quiet || git commit -m "Update manifest file for Meta GPT"
-            git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:main
+            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
           else
             echo "❌ Manifest dosyası bulunamadı, push işlemi yapılmadı."
