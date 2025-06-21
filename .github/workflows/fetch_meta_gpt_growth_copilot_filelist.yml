@@ -1,4 +1,4 @@
-name: Generate Meta GPT Growth Copilot Filelist
+name: Run Meta GPT Growth Copilot Filelist
 
 on:
   schedule:
