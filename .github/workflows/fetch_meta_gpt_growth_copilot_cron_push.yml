@@ -41,3 +41,4 @@ jobs:
             git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git HEAD:main
           else
             echo "⚠️ Log dosyası bulunamadı, commit işlemi atlandı."
+          fi
