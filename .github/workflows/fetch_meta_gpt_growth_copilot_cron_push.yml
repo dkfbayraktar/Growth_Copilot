@@ -22,6 +22,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: OpenAI GPT metadata dosyasını PATCH et
+        working-directory: Meta_Marketing_API
         env:
           GPT_Growth_Copilot_ID: ${{ secrets.GPT_Growth_Copilot_ID }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
