@@ -38,3 +38,4 @@ jobs:
             git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
           else
             echo "❌ Manifest dosyası bulunamadı, push işlemi yapılmadı."
+          fi
