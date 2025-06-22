@@ -51,6 +51,11 @@ def normalize_demographic_kpi():
 
         total_values = df_agg.iloc[0]
 
+        # first_seen_date, last_seen_date, duration (days) metriklerini ekle
+        for extra_col in ['first_seen_date', 'last_seen_date', 'duration (days)']:
+            if extra_col in df_perf.columns:
+                total_values[extra_col] = df_perf[df_perf['ad_id'] == ad_id][extra_col].iloc[0]
+
         for idx, row in group.iterrows():
             ratio_row = {}
             for col in all_kpi_columns:
@@ -64,11 +69,29 @@ def normalize_demographic_kpi():
 
             full_row = {**base_info, **breakdown_info, **ratio_row}
 
-            # AD details bilgilerini eşleştir
-            ad_info = df_ad_details[df_ad_details['ad_id'] == ad_id].iloc[0].to_dict() if ad_id in df_ad_details['ad_id'].values else {}
-            full_row.update(ad_info)
+            for extra_col in ['first_seen_date', 'last_seen_date', 'duration (days)']:
+                if extra_col in total_values:
+                    full_row[extra_col] = total_values[extra_col]
 
-            normalized_rows.append(full_row)
+            # AD details bilgilerini eşleştir (sadece olmayanları ekle)
+            if ad_id in df_ad_details['ad_id'].values:
+                ad_info = df_ad_details[df_ad_details['ad_id'] == ad_id].iloc[0].to_dict()
+                for key, val in ad_info.items():
+                    if key not in full_row:
+                        full_row[key] = val
+
+            
+
+                # Satır bazlı KPI'ları hesapla ve ekle (en son işlem olarak uygulanır)
+    full_row['row_ctr'] = full_row['clicks'] / full_row['impressions'] if full_row['impressions'] else 0
+    full_row['row_cpc'] = full_row['spend'] / full_row['clicks'] if full_row['clicks'] else 0
+    full_row['row_cpm'] = (full_row['spend'] / full_row['impressions']) * 1000 if full_row['impressions'] else 0
+    full_row['row_roas'] = full_row['purchase_conversion_value'] / full_row['spend'] if full_row['spend'] else 0
+    full_row['row_cvr'] = full_row['purchase'] / full_row['clicks'] if full_row['clicks'] else 0
+    full_row['row_cvr_funnel'] = (full_row['purchase'] + full_row['add_to_cart'] + full_row['initiate_checkout']) / full_row['clicks'] if full_row['clicks'] else 0
+    full_row['row_purchase_funnel'] = full_row['purchase'] + full_row['add_to_cart'] + full_row['initiate_checkout']
+
+    normalized_rows.append(full_row)
 
     df_normalized = pd.DataFrame(normalized_rows)
     df_normalized.to_parquet(NORMALIZED_PATH, index=False)
