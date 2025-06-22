@@ -121,15 +121,6 @@ def fetch_and_save_meta_demographic_data():
         df_existing = df_existing[df_existing['veri_tarihi'] != pd.to_datetime(check_date)]
         df_combined = pd.concat([df_existing, df_new], ignore_index=True)
 
-        # KPI: ad_id bazında ilk ve son görünme günü ve duration
-        df_combined['veri_tarihi'] = pd.to_datetime(df_combined['veri_tarihi'])
-        first_seen = df_combined.groupby('ad_id')['veri_tarihi'].min().reset_index().rename(columns={'veri_tarihi': 'first_seen_date'})
-        last_seen = df_combined.groupby('ad_id')['veri_tarihi'].max().reset_index().rename(columns={'veri_tarihi': 'last_seen_date'})
-
-        df_combined = df_combined.merge(first_seen, on='ad_id', how='left')
-        df_combined = df_combined.merge(last_seen, on='ad_id', how='left')
-        df_combined['duration (days)'] = (df_combined['last_seen_date'] - df_combined['first_seen_date']).dt.days + 1
-
         df_combined.to_parquet(DATA_PATH, index=False)
         print(f"Demografik veri kaydedildi: {DATA_PATH}")
     else:
