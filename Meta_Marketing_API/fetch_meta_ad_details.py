@@ -76,8 +76,6 @@ def fetch_and_save_ad_details():
                         'name': ad_detail.get('name', ''),
                         'effective_status': ad_detail.get('effective_status', ''),
                         'ad_status': ad_detail.get('status', ''),
-                        'start_time': ad_detail.get('created_time', ''),
-                        'stop_time': ad_detail.get('updated_time', ''),
                         'page_id': ad_detail.get('page_id', ''),
                         'instagram_actor_id': ad_detail.get('instagram_actor_id', ''),
                         'adlabels': ad_detail.get('adlabels', ''),
@@ -92,16 +90,6 @@ def fetch_and_save_ad_details():
                         'engagement_rate_ranking': ad_insights.get('engagement_rate_ranking', ''),
                         'conversion_rate_ranking': ad_insights.get('conversion_rate_ranking', '')
                     }
-
-                    try:
-                        start_dt = datetime.strptime(ad_data['start_time'][:10], '%Y-%m-%d').date()
-                        if ad_data['stop_time']:
-                            stop_dt = datetime.strptime(ad_data['stop_time'][:10], '%Y-%m-%d').date()
-                            ad_data['duration (days)'] = (stop_dt - start_dt).days
-                        else:
-                            ad_data['duration (days)'] = (today - start_dt).days
-                    except:
-                        ad_data['duration (days)'] = None
 
                     creative_id = ad_data['creative_id']
                     if creative_id:
